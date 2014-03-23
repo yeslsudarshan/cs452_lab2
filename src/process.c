@@ -383,6 +383,7 @@ ProcessSuspend (PCB *suspend)
   ASSERT (suspend->flags & PROCESS_STATUS_RUNNABLE,
 	  "Trying to suspend a non-running process!\n");
   ProcessSetStatus (suspend, PROCESS_STATUS_WAITING);
+  suspend->sleep_timestamp = my_timer_get(); //CS452 - Added to keep track of when the process went to sleep.
   QueueRemove (&suspend->l);
   QueueInsertLast (&waitQueue, &suspend->l);
 }
@@ -403,17 +404,28 @@ ProcessSuspend (PCB *suspend)
 void
 ProcessWakeup (PCB *wakeup)
 {
+  uint32 wakeup_time,i;
+  double load=1;
   dbprintf ('p',"Waking up PCB 0x%x.\n", wakeup);
   // Make sure it's not yet a runnable process.
   ASSERT (wakeup->flags & PROCESS_STATUS_WAITING,
           "Trying to wake up a non-sleeping process!\n");
   ProcessSetStatus (wakeup, PROCESS_STATUS_RUNNABLE);
-  QueueRemove (&wakeup->l);
-  QueueInsertLast (&runQueue, &wakeup->l);
+  wakeup_time = my_timer_get();
+  i = (uint32)((wakeup_time - wakeup->sleep_timestamp)/1000);
+  while(i>0)
+   { 
+     load*= 2/3;
+     i--;
+   }
+   wakeup->estcpu = (uint32)((wakeup->estcpu)*load);
+   wakeup->user_prio = PUSER + (wakeup->estcpu)/4 + 2*wakeup->p_nice;
+  
+   QueueRemove (&wakeup->l);
+   QueueInsertLast (&runQueue[(wakeup->user_prio)/4], &wakeup->l);
 
 }
 
-
 //----------------------------------------------------------------------
 //
 //	ProcessDestroy
@@ -563,7 +575,14 @@ ProcessFork (VoidFunc func, uint32 param, int p_nice, int p_info,char *name, int
   //---------------------------------------
   // Lab3: initialized pcb member for your scheduling algorithm here
   //--------------------------------------
+     pcb->estcpu = 0;
 
+     if(p_nice<0)
+      pcb->p_nice = 0;
+     else
+      pcb->p_nice = p_nice;
+     pcb->user_prio = PUSER;
+     pcb->sleep_timestamp = 0;
 
   //----------------------------------------------------------------------
   // Stacks grow down from the top.  The current system stack pointer has
