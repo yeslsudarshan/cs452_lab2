@@ -280,7 +280,7 @@ void
 ProcessSchedule ()
 {
   PCB           *pcb;
-  int           i;
+  int           i,empty;
  
 
   //Each context switch increments the quanta
@@ -294,11 +294,14 @@ ProcessSchedule ()
  
    //4.4 BSD
   for(i=0;i<NUM_OF_RUNQUEUE;i++){
-  	if (QueueEmpty (&runQueue[i])) {
+  	if (QueueEmpty (&runQueue[i])) 
+           empty++;
+      }
+           if(empty == NUM_OF_RUNQUEUE){
 	    printf ("No runnable processes - exiting!\n");
 	    exitsim (); // NEVER RETURNS
 	    }
-	}	
+		
 
   /* --------------- BSD 4.4 MULTILEVEL QUEUE SCHEDULER EXPLANATION ----------
 
