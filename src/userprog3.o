@@ -1,0 +1,262 @@
+; Compiled by GCC
+.data
+	.align 2
+LC0:
+	.ascii "timer = %d\n\000"
+	.align 2
+LC1:
+	.ascii "Setting number = %d\n\000"
+	.align 2
+LC2:
+	.ascii "1\000"
+	.align 2
+LC3:
+	.ascii "userprog4.dlx.obj\000"
+	.align 2
+LC4:
+	.ascii "%c%d\n\000"
+	.align 2
+LC5:
+	.ascii "Usage: \000"
+	.align 2
+LC6:
+	.ascii " number\n\000"
+	.align 2
+LC7:
+	.ascii "argc = %d\n\000"
+.text
+	.align 2
+.proc _main
+.global _main
+_main:
+;  Function 'main'; 32 bytes of locals, 0 regs to save.
+	sw	-4(r29),r30	; push fp
+	add	r30,r0,r29	; fp = sp
+	sw	-8(r29),r31	; push ret addr
+	subui	r29,r29,#40	; alloc local storage
+	lw	r2,(r30)
+	lw	r3,4(r30)
+	jal	___main
+	nop	; not filled.
+	seqi	r1,r2,#2
+	bnez	r1,L3
+	nop	; not filled.
+	seqi	r1,r2,#3
+	beqz	r1,L35
+	nop	; not filled.
+	j	L14
+	nop	; not filled.
+L3:
+	jal	_TimerGet
+	nop	; not filled.
+	addi	r29,r29,#-8
+	lhi	r8,((LC0)>>16)&0xffff
+	addui	r8,r8,(LC0)&0xffff
+	sw	(r29),r8
+	sw	4(r29),r1
+	jal	_Printf
+	nop	; not filled.
+	addi	r29,r29,#-8
+	lw	r3,4(r3)
+	sw	(r29),r3
+	addi	r8,r0,#0
+	sw	4(r29),r8
+	addi	r8,r0,#10
+	sw	8(r29),r8
+	jal	_dstrtol
+	nop	; not filled.
+	add	r5,r0,r1
+	lhi	r8,((LC1)>>16)&0xffff
+	addui	r8,r8,(LC1)&0xffff
+	sw	(r29),r8
+	sw	4(r29),r5
+	jal	_Printf
+	nop	; not filled.
+	addi	r3,r0,#0
+	addi	r29,r29,#16
+L7:
+	addi	r29,r29,#-8
+	lhi	r8,((LC2)>>16)&0xffff
+	addui	r8,r8,(LC2)&0xffff
+	sw	(r29),r8
+	jal	_Printf
+	nop	; not filled.
+	addi	r29,r29,#8
+	addi	r3,r3,#1
+	slei	r1,r3,#49
+	bnez	r1,L7
+	nop	; not filled.
+	jal	_TimerGet
+	nop	; not filled.
+	addi	r29,r29,#-8
+	lhi	r2,((LC0)>>16)&0xffff
+	addui	r2,r2,(LC0)&0xffff
+	sw	(r29),r2
+	sw	4(r29),r1
+	jal	_Printf
+	nop	; not filled.
+	addi	r8,r0,#1
+	sw	(r29),r8
+	jal	_sem_create
+	nop	; not filled.
+	sw	(r29),r1
+	addi	r4,r30,#-40
+	sw	4(r29),r4
+	jal	_ditoa
+	nop	; not filled.
+	jal	_TimerGet
+	nop	; not filled.
+	sw	(r29),r2
+	sw	4(r29),r1
+	jal	_Printf
+	nop	; not filled.
+	addi	r3,r0,#0
+	addi	r29,r29,#8
+	slt	r1,r3,r5
+	beqz	r1,L10
+	nop	; not filled.
+	addi	r2,r30,#-24
+L12:
+	addi	r29,r29,#-8
+	sw	(r29),r3
+	sw	4(r29),r2
+	jal	_ditoa
+	nop	; not filled.
+	addi	r29,r29,#-16
+	sw	(r29),r3
+	addi	r8,r0,#0
+	sw	4(r29),r8
+	lhi	r8,((LC3)>>16)&0xffff
+	addui	r8,r8,(LC3)&0xffff
+	sw	8(r29),r8
+	sw	12(r29),r2
+	sw	16(r29),r4
+	addi	r8,r0,#0
+	sw	20(r29),r8
+	jal	_process_create
+	nop	; not filled.
+	addi	r29,r29,#24
+	addi	r3,r3,#1
+	slt	r1,r3,r5
+	bnez	r1,L12
+	nop	; not filled.
+L10:
+	jal	_TimerGet
+	nop	; not filled.
+	addi	r29,r29,#-8
+	lhi	r8,((LC0)>>16)&0xffff
+	addui	r8,r8,(LC0)&0xffff
+	sw	(r29),r8
+	sw	4(r29),r1
+	jal	_Printf
+	nop	; not filled.
+	jal	_yield
+	nop	; not filled.
+	addi	r29,r29,#8
+	j	L2
+	nop	; not filled.
+L14:
+	addi	r29,r29,#-16
+	lw	r8,4(r3)
+	sw	(r29),r8
+	addi	r8,r0,#0
+	sw	4(r29),r8
+	addi	r8,r0,#10
+	sw	8(r29),r8
+	jal	_dstrtol
+	nop	; not filled.
+	add	r7,r0,r1
+	lw	r3,8(r3)
+	sw	(r29),r3
+	addi	r8,r0,#0
+	sw	4(r29),r8
+	addi	r8,r0,#10
+	sw	8(r29),r8
+	jal	_dstrtol
+	nop	; not filled.
+	add	r4,r0,r1
+	addi	r3,r0,#0
+	addi	r29,r29,#16
+	addui	r5,r0,#49999
+	addi	r6,r7,#65
+L18:
+	addi	r2,r0,#0
+L21:
+	addi	r2,r2,#1
+	sle	r1,r2,r5
+	bnez	r1,L21
+	nop	; not filled.
+	addi	r29,r29,#-16
+	lhi	r8,((LC4)>>16)&0xffff
+	addui	r8,r8,(LC4)&0xffff
+	sw	(r29),r8
+	sw	4(r29),r6
+	sw	8(r29),r3
+	jal	_Printf
+	nop	; not filled.
+	addi	r29,r29,#16
+	addi	r3,r3,#1
+	slei	r1,r3,#29
+	bnez	r1,L18
+	nop	; not filled.
+	addi	r3,r0,#0
+	addui	r5,r0,#49999
+	addi	r6,r7,#65
+L28:
+	addi	r29,r29,#-8
+	sw	(r29),r4
+	jal	_sem_wait
+	nop	; not filled.
+	addi	r2,r0,#0
+	addi	r29,r29,#8
+L31:
+	addi	r2,r2,#1
+	sle	r1,r2,r5
+	bnez	r1,L31
+	nop	; not filled.
+	addi	r29,r29,#-16
+	lhi	r8,((LC4)>>16)&0xffff
+	addui	r8,r8,(LC4)&0xffff
+	sw	(r29),r8
+	sw	4(r29),r6
+	sw	8(r29),r3
+	jal	_Printf
+	nop	; not filled.
+	sw	(r29),r4
+	jal	_sem_signal
+	nop	; not filled.
+	addi	r29,r29,#16
+	addi	r3,r3,#1
+	slei	r1,r3,#29
+	beqz	r1,L2
+	nop	; not filled.
+	j	L28
+	nop	; not filled.
+L35:
+	addi	r29,r29,#-8
+	lhi	r8,((LC5)>>16)&0xffff
+	addui	r8,r8,(LC5)&0xffff
+	sw	(r29),r8
+	jal	_Printf
+	nop	; not filled.
+	lw	r3,(r3)
+	sw	(r29),r3
+	jal	_Printf
+	nop	; not filled.
+	lhi	r8,((LC6)>>16)&0xffff
+	addui	r8,r8,(LC6)&0xffff
+	sw	(r29),r8
+	jal	_Printf
+	nop	; not filled.
+	lhi	r8,((LC7)>>16)&0xffff
+	addui	r8,r8,(LC7)&0xffff
+	sw	(r29),r8
+	sw	4(r29),r2
+	jal	_Printf
+	nop	; not filled.
+	jal	_exit
+	nop	; not filled.
+L2:
+	jal	_exit
+	nop
+.endproc _main

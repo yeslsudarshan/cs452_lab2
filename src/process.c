@@ -294,10 +294,12 @@ ProcessSchedule ()
  
    //4.4 BSD
   for(i=0;i<NUM_OF_RUNQUEUE;i++){
-  	if (QueueEmpty (&runQueue[i])) {
+  	if (!QueueEmpty (&runQueue[i])) 
+  		break;
+        else if(i==(NUM_OF_RUNQUEUE-1)){
 	    printf ("No runnable processes - exiting!\n");
 	    exitsim (); // NEVER RETURNS
-	    }
+	  }
 	}	
 
   /* --------------- BSD 4.4 MULTILEVEL QUEUE SCHEDULER EXPLANATION ----------
@@ -330,10 +332,11 @@ ProcessSchedule ()
   if(total_num_quanta%10==0){
 	decay_estcpu_prio(&runQueue[0]);
         reorder_q_all(&runQueue[0]);
-        //find next runnable process queue
+              }
+
+ //find next runnable process queue
         while(QueueEmpty(&runQueue[i]))        
          i++;
-       } 
 
 // Move the front of the queue to the end, if it is the running process.
   pcb = (PCB *)((QueueFirst (&runQueue[i]))->object);
