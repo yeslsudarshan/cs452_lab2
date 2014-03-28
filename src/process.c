@@ -213,7 +213,7 @@ void decay_estcpu_prio(Queue* q)
 	if(!QueueEmpty(&q[i]))
 	  { 
 	    l = QueueFirst(&q[i]);
-	    while(flag = 0){
+	    while(flag == 0){
               /*If this is the tail, this is the final pass*/
               if(l == tail[i])
 		flag = 1;
@@ -239,7 +239,7 @@ void decay_estcpu_prio(Queue* q)
 
  void quanta_q_update(PCB* pcb,Queue* q,int i)
   {
-     if((pcb->estcpu)%4==0)
+     if((uint32)(pcb->estcpu)%4==0)
       {
         pcb->user_prio = PUSER+(pcb->estcpu)/4 + 2*pcb->p_nice;
         if((pcb->user_prio)/4!=i)
@@ -314,7 +314,7 @@ ProcessSchedule ()
   // The OS exits if there's no runnable process.  This is a feature, not a
   // bug.  An easy solution to allowing no runnable "user" processes is to
   // have an "idle" process that's simply an infinite loop.
-   print_q_state(&runQueue); 
+
    //4.4 BSD
   for(i=0;i<NUM_OF_RUNQUEUE;i++){
   	if (!QueueEmpty (&runQueue[i])) 
@@ -354,12 +354,12 @@ ProcessSchedule ()
  //Global quantum tracker for 1s
         i=0;
   if(total_num_quanta%10==0){
-        printf("Before decay"); 
+        printf("\nBefore decay "); 
         print_q_state(&runQueue[0]);
         printf("-------\n"); 
 	decay_estcpu_prio(&runQueue[0]);
         reorder_q_all(&runQueue[0]);
-        printf("After decay"); 
+        printf("After decay "); 
         print_q_state(&runQueue[0]);
         printf("-------\n"); 
 
@@ -454,8 +454,8 @@ ProcessWakeup (PCB *wakeup)
      load*= 2/3;
      i--;
    }
-   wakeup->estcpu = (uint32)((wakeup->estcpu)*load);
-   wakeup->user_prio = PUSER + (wakeup->estcpu)/4 + 2*wakeup->p_nice;
+   wakeup->estcpu = (wakeup->estcpu)*load;
+   wakeup->user_prio = (uint32)(PUSER + (wakeup->estcpu)/4 + 2*wakeup->p_nice);
   
    QueueRemove (&wakeup->l);
    QueueInsertLast (&runQueue[(wakeup->user_prio)/4], &wakeup->l);
@@ -545,7 +545,7 @@ uint32 get_argument(char *string)
 //
 //----------------------------------------------------------------------
 int
-ProcessFork (VoidFunc func, uint32 param, int p_nice, int p_info,char *name, int isUser)
+ProcessFork (VoidFunc func, uint32 param, int p_nice,int p_info,char *name, int isUser)
 {
   int		i, j, fd, n;
   Link		*l;
@@ -613,7 +613,7 @@ ProcessFork (VoidFunc func, uint32 param, int p_nice, int p_info,char *name, int
   //--------------------------------------
      pcb->estcpu = 0;
 
-     if(p_nice<0)
+     if(p_nice)
       pcb->p_nice = 0;
      else
       pcb->p_nice = p_nice;
