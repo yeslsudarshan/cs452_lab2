@@ -188,9 +188,12 @@ void decay_estcpu_prio(Queue* q)
 	      t = pcb->estcpu;
 	      myprintf (" \n estcpu = %0.2f  ",pcb->estcpu);
 	      myprintf (" \n PID %d Prio = %d ",pcb - &pcbs[0],pcb->user_prio);
-	      pcb->estcpu *= 1.6667;
+	      pcb->estcpu *= 2/3;
 	      pcb->estcpu += pcb->p_nice; //Calculate the decayed estcpu for the proc
        	      pcb->user_prio = PUSER + (pcb->estcpu)/4 + 2*pcb->p_nice; //Recalculate the priority
+ 	      if(pcb->user_prio > 127)
+     	 	pcb->user_prio = 127;
+	
  	      t = pcb->estcpu;
 	      myprintf (" \n new estcpu = %0.2f  ",pcb->estcpu);
 	      myprintf (" \n PID %d new Prio = %d ",pcb - &pcbs[0],pcb->user_prio);
@@ -253,6 +256,8 @@ void quanta_q_update(PCB* pcb,Queue* q,int i)
 		myprintf (" \n estcpu = %0.2f p_nice = %d",pcb->estcpu,pcb->p_nice);
 		myprintf (" \n PID %d Prio = %d --> ",pcb - &pcbs[0],pcb->user_prio);
 		pcb->user_prio = PUSER+(pcb->estcpu)/4 + 2*pcb->p_nice;
+                if(pcb->user_prio > 127)
+  		  pcb->user_prio = 127;
 		myprintf ("%d\n", pcb->user_prio);
 		if((pcb->user_prio)/4!=i)
 		{
@@ -359,13 +364,12 @@ ProcessSchedule ()
   
  //Update the quanta of the proc at the head of the active running queue
    i=0;
-
+  currentPCB->exec_quanta++;
   print_q_state(&runQueue[0]); 
   while(QueueEmpty(&runQueue[i]))
      i++;
   pcb =(PCB*)((QueueFirst(&runQueue[i]))->object);
   pcb->estcpu++;
-  pcb->exec_quanta++;
   quanta_q_update(pcb,&runQueue[0],i);
   
  //Global quantum tracker for 1s
@@ -390,6 +394,10 @@ ProcessSchedule ()
   {
     QueueRemove (&pcb->l);
     QueueInsertLast (&runQueue[i], &pcb->l);
+   i = 0; 
+    while(QueueEmpty(&runQueue[i]))        
+         i++;
+
   }
 
   // Now, run the one at the head of the queue.
