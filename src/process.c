@@ -250,6 +250,28 @@ void decay_estcpu_prio(Queue* q)
      }
   }
 
+  void print_q_state(Queue *q)
+  { 
+   int i=0,j=0;
+   Link *l; 
+   PCB* pcb;
+
+   while(i<NUM_OF_RUNQUEUE)
+     {  
+   	if(!QueueEmpty(&q[i]))
+	 { l = QueueFirst(&q[i]);
+          pcb = ((PCB*)l->object);
+           printf("In queue[%d]: %d --> ",i,pcb);
+ 	   for(j=0;j<q[i].nitems-1;j++)
+	    {  l = QueueNext(l);
+               pcb = ((PCB*)l->object);
+ 	       printf("%d --> ",pcb);
+            }
+	    printf("\n");
+          }
+        i++;
+      }
+ }
 //---------------------CS452__4.4 BSD SCHEDULING SPECIFIC END--------------------------/
 
 
@@ -285,13 +307,14 @@ ProcessSchedule ()
 
   //Each context switch increments the quanta
   total_num_quanta++;
+  printf("Current no. of Quanta elapsed : %d \n",total_num_quanta);
 
   dbprintf ('p', "Now entering ProcessSchedule (cur=0x%x, %d ready)\n",
             currentPCB, QueueLength (&runQueue));
   // The OS exits if there's no runnable process.  This is a feature, not a
   // bug.  An easy solution to allowing no runnable "user" processes is to
   // have an "idle" process that's simply an infinite loop.
- 
+   print_q_state(&runQueue); 
    //4.4 BSD
   for(i=0;i<NUM_OF_RUNQUEUE;i++){
   	if (!QueueEmpty (&runQueue[i])) 
@@ -327,15 +350,23 @@ ProcessSchedule ()
   pcb->estcpu++;
   quanta_q_update(pcb,&runQueue[0],i);
   
+  print_q_state(&runQueue[0]); 
  //Global quantum tracker for 1s
-   i = 0; 
+        i=0;
   if(total_num_quanta%10==0){
+        printf("Before decay"); 
+        print_q_state(&runQueue[0]);
+        printf("-------\n"); 
 	decay_estcpu_prio(&runQueue[0]);
         reorder_q_all(&runQueue[0]);
+        printf("After decay"); 
+        print_q_state(&runQueue[0]);
+        printf("-------\n"); 
+
               }
 
  //find next runnable process queue
-        while(QueueEmpty(&runQueue[i]))        
+ while(QueueEmpty(&runQueue[i]))        
          i++;
 
 // Move the front of the queue to the end, if it is the running process.
@@ -347,8 +378,10 @@ ProcessSchedule ()
   }
 
   // Now, run the one at the head of the queue.
+  printf(" Current PCB is %d ",currentPCB);
   pcb = (PCB *)((QueueFirst (&runQueue[i]))->object);
   currentPCB = pcb;
+  printf(" New PCB is %d ",currentPCB);
   dbprintf ('p',"About to switch to PCB 0x%x,flags=0x%x @ 0x%x\n",
             pcb, pcb->flags,
             pcb->sysStackPtr[PROCESS_STACK_IAR]);
