@@ -185,7 +185,9 @@ void decay_estcpu_prio(Queue* q)
             while(flag==0){
 	      pcb = (PCB*)(l->object);
 	      pcb->estcpu = (2*pcb->estcpu)/3 + pcb->p_nice; //Calculate the decayed estcpu for the proc
+       	      printf("\n For %d Old priority = %d",pcb,pcb->user_prio); 
               pcb->user_prio = PUSER + (pcb->estcpu)/4 + 2*pcb->p_nice; //Recalculate the priority
+       	      printf("New priority = %d \n",pcb->user_prio);
 	      if(l == QueueLast(&q[i])) 
  		flag = 1;
               else             
@@ -240,11 +242,13 @@ void decay_estcpu_prio(Queue* q)
  void quanta_q_update(PCB* pcb,Queue* q,int i)
   {
      if((uint32)(pcb->estcpu)%4==0)
-      {
-        pcb->user_prio = PUSER+(pcb->estcpu)/4 + 2*pcb->p_nice;
+      { 
+       printf("\n For %d Old priority = %d",pcb,pcb->user_prio); 
+       pcb->user_prio = PUSER+(pcb->estcpu)/4 + 2*pcb->p_nice;
+       printf(" New priority = %d \n",pcb->user_prio); 
         if((pcb->user_prio)/4!=i)
-         {
-           QueueRemove(&pcb->l);
+         { 
+ 	   QueueRemove(&pcb->l);
            QueueInsertLast(&q[i],&pcb->l);
          }
      }
@@ -455,8 +459,9 @@ ProcessWakeup (PCB *wakeup)
      i--;
    }
    wakeup->estcpu = (wakeup->estcpu)*load;
+   printf("\n waking up %d, current pritority %d ",wakeup,wakeup->user_prio);
    wakeup->user_prio = (uint32)(PUSER + (wakeup->estcpu)/4 + 2*wakeup->p_nice);
-  
+   printf("\n new priority %d",wakeup->user_prio);
    QueueRemove (&wakeup->l);
    QueueInsertLast (&runQueue[(wakeup->user_prio)/4], &wakeup->l);
 
