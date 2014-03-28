@@ -50,6 +50,7 @@ typedef struct PCB {
   Link		l;		// Used for keeping PCB in queues
  // put in data used for your scheduling algorithm here
   uint32        user_prio;      //current priority for the user process
+  uint32        exec_quanta;
   float 	estcpu; 	//The estcpu for the process. Incremented every quantum
   float 	sleep_timestamp; //time stamp when the process was put to bed(In quantum)
   float         wakeup_timestamp; 

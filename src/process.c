@@ -178,20 +178,27 @@ void decay_estcpu_prio(Queue* q)
     Link *l;
     int i,j=0,flag=0;
     PCB* pcb;
+    float t;
     for(i=0;i<NUM_OF_RUNQUEUE;i++){
 	if(!QueueEmpty(&q[i]))
  	 {   
             l = QueueFirst(&q[i]);
             while(flag==0){
 	      pcb = (PCB*)(l->object);
-	      pcb->estcpu = (2*pcb->estcpu)/3 + pcb->p_nice; //Calculate the decayed estcpu for the proc
-       	      printf("\n For %d Old priority = %d",pcb,pcb->user_prio); 
-              pcb->user_prio = PUSER + (pcb->estcpu)/4 + 2*pcb->p_nice; //Recalculate the priority
-       	      printf("New priority = %d \n",pcb->user_prio);
+	      t = pcb->estcpu;
+	      myprintf (" \n estcpu = %0.2f  ",pcb->estcpu);
+	      myprintf (" \n PID %d Prio = %d ",pcb - &pcbs[0],pcb->user_prio);
+	      pcb->estcpu *= 1.6667;
+	      pcb->estcpu += pcb->p_nice; //Calculate the decayed estcpu for the proc
+       	      pcb->user_prio = PUSER + (pcb->estcpu)/4 + 2*pcb->p_nice; //Recalculate the priority
+ 	      t = pcb->estcpu;
+	      myprintf (" \n new estcpu = %0.2f  ",pcb->estcpu);
+	      myprintf (" \n PID %d new Prio = %d ",pcb - &pcbs[0],pcb->user_prio);
 	      if(l == QueueLast(&q[i])) 
  		flag = 1;
               else             
    	        l = l->next;    
+
 	      }
 	}
       flag = 0;
@@ -226,7 +233,7 @@ void reorder_q_all(Queue* q)
 					if(flag!=1)
 						l = l->next;  // Get the next in this queue before link is lost.
 					QueueRemove(&pcb->l);
-					QueueInsertLast(&q[i],&pcb->l);
+					QueueInsertLast(&q[(pcb->user_prio)/4],&pcb->l);
 				}
 				else
 				{
@@ -235,20 +242,22 @@ void reorder_q_all(Queue* q)
 				} 
 			} 
 		}
-	}
-	flag = 0;
+	}flag = 0;
+
 }
 
 void quanta_q_update(PCB* pcb,Queue* q,int i)
 {
-	if((uint32)(pcb->estcpu)%4==0)
-	{
-		myprintf ("PID %d : Prio = %d --> ", pcb - &pcbs[0], pcb->user_prio);
+	if((uint32)(pcb->exec_quanta)%4==0)
+	{       myprintf(" \n exec quanta = %d ",pcb->exec_quanta);
+		myprintf (" \n estcpu = %0.2f p_nice = %d",pcb->estcpu,pcb->p_nice);
+		myprintf (" \n PID %d Prio = %d --> ",pcb - &pcbs[0],pcb->user_prio);
 		pcb->user_prio = PUSER+(pcb->estcpu)/4 + 2*pcb->p_nice;
 		myprintf ("%d\n", pcb->user_prio);
 		if((pcb->user_prio)/4!=i)
 		{
 			QueueRemove(&pcb->l);
+			i = pcb->user_prio / 4;
 			QueueInsertLast(&q[i],&pcb->l);
 		}
 	}
@@ -263,11 +272,13 @@ void print_q_state(Queue *q)
 	while(i<NUM_OF_RUNQUEUE)
 	{  
 		if(!QueueEmpty(&q[i]))
-		{ l = QueueFirst(&q[i]);
+		{ 
+			l = QueueFirst(&q[i]);
 			pcb = ((PCB*)l->object);
 			myprintf("[%d]: %d ",i,pcb - &pcbs[0]);
 			for(j=0;j<q[i].nitems-1;j++)
-			{  l = QueueNext(l);
+			{  
+				l = QueueNext(l);
 				pcb = ((PCB*)l->object);
 				myprintf("---> %d",pcb - &pcbs[0]);
 			}
@@ -348,13 +359,15 @@ ProcessSchedule ()
   
  //Update the quanta of the proc at the head of the active running queue
    i=0;
+
+  print_q_state(&runQueue[0]); 
   while(QueueEmpty(&runQueue[i]))
      i++;
   pcb =(PCB*)((QueueFirst(&runQueue[i]))->object);
   pcb->estcpu++;
+  pcb->exec_quanta++;
   quanta_q_update(pcb,&runQueue[0],i);
   
-  print_q_state(&runQueue[0]); 
  //Global quantum tracker for 1s
         i=0;
   if(total_num_quanta%10==0){
@@ -457,9 +470,9 @@ ProcessWakeup (PCB *wakeup)
      i--;
    }
    wakeup->estcpu = (wakeup->estcpu)*load;
-   printf("\n waking up %d, current pritority %d ",wakeup,wakeup->user_prio);
+   //printf("\n waking up %d, current pritority %d ",wakeup,wakeup->user_prio);
    wakeup->user_prio = (uint32)(PUSER + (wakeup->estcpu)/4 + 2*wakeup->p_nice);
-   printf("\n new priority %d",wakeup->user_prio);
+   //printf("\n new priority %d",wakeup->user_prio);
    QueueRemove (&wakeup->l);
    QueueInsertLast (&runQueue[(wakeup->user_prio)/4], &wakeup->l);
 
@@ -616,12 +629,13 @@ ProcessFork (VoidFunc func, uint32 param, int p_nice,int p_info,char *name, int 
   //--------------------------------------
      pcb->estcpu = 0;
 
-     if(p_nice)
+     if(p_nice<0)
       pcb->p_nice = 0;
      else
       pcb->p_nice = p_nice;
      pcb->user_prio = PUSER;
      pcb->sleep_timestamp = 0;
+     pcb->exec_quanta = 0;
 
   //----------------------------------------------------------------------
   // Stacks grow down from the top.  The current system stack pointer has
