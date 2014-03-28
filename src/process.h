@@ -13,6 +13,8 @@
 #include "queue.h"
 //#include "share_memory.h"
 
+#define myprintf printf
+
 #define	PROCESS_MAX_PROCS	32	// Maximum number of active processes
 
 #define	PROCESS_INIT_ISR_SYS	0x140	// Initial status reg value for system processes

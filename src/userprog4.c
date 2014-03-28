@@ -27,13 +27,13 @@ main (int argc, char *argv[])
       for(i=0;i<30;i++)
       {
         for(j=0;j<50000;j++);
-        Printf("%c%d\n",'A'+offset,i);
+        Printf("\n\n%c%d\n",'A'+offset,i);
       } 
       for(i=0;i<30;i++)
       {
         sem_wait(semaphore);
         for(j=0;j<50000;j++);
-        Printf("%c%d\n",'A'+offset,i);
+        Printf("\n\n%c%d\n",'A'+offset,i);
         sem_signal(semaphore);
       } 
 

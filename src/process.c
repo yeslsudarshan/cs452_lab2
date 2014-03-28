@@ -197,81 +197,84 @@ void decay_estcpu_prio(Queue* q)
  }
 
 // Reorders the multilevel queue based on the adjusted priorities.                 
- void reorder_q_all(Queue* q)
- {   
-    Link* tail[NUM_OF_RUNQUEUE];
-    Link* l;
-    int flag = 0;
-    PCB* pcb;
-    int i;
-    /*Mark the tails*/
-    for(i=0;i<NUM_OF_RUNQUEUE;i++){
-	if(!QueueEmpty(&q[i]))
-           tail[i] = QueueLast(&q[i]);
-     }
-    for(i=0;i<NUM_OF_RUNQUEUE;i++){   
-	if(!QueueEmpty(&q[i]))
-	  { 
-	    l = QueueFirst(&q[i]);
-	    while(flag == 0){
-              /*If this is the tail, this is the final pass*/
-              if(l == tail[i])
-		flag = 1;
-              /*Reordering */
-	      pcb = (PCB*)(l->object);
-	     if(i!=(pcb->user_prio)/4)
-	      {  
-		 if(flag!=1)
-		    l = l->next;  // Get the next in this queue before link is lost.
- 		QueueRemove(&pcb->l);
-	        QueueInsertLast(&q[i],&pcb->l);
-              }
-              else
-	      {
-		 if(flag!=1)
-		    l = l->next; 
-              } 
-	   } 
-        }
-      }
-      flag = 0;}
- 
+void reorder_q_all(Queue* q)
+{   
+	Link* tail[NUM_OF_RUNQUEUE];
+	Link* l;
+	int flag = 0;
+	PCB* pcb;
+	int i;
+	/*Mark the tails*/
+	for(i=0;i<NUM_OF_RUNQUEUE;i++){
+		if(!QueueEmpty(&q[i]))
+			tail[i] = QueueLast(&q[i]);
+	}
+	for(i=0;i<NUM_OF_RUNQUEUE;i++){   
+		if(!QueueEmpty(&q[i]))
+		{ 
+			l = QueueFirst(&q[i]);
+			while(flag == 0){
+				/*If this is the tail, this is the final pass*/
+				if(l == tail[i])
+					flag = 1;
+				/*Reordering */
+				pcb = (PCB*)(l->object);
+				if(i!=(pcb->user_prio)/4)
+				{  
+					if(flag!=1)
+						l = l->next;  // Get the next in this queue before link is lost.
+					QueueRemove(&pcb->l);
+					QueueInsertLast(&q[i],&pcb->l);
+				}
+				else
+				{
+					if(flag!=1)
+						l = l->next; 
+				} 
+			} 
+		}
+	}
+	flag = 0;
+}
 
- void quanta_q_update(PCB* pcb,Queue* q,int i)
-  {
-     if((uint32)(pcb->estcpu)%4==0)
-      {
-        pcb->user_prio = PUSER+(pcb->estcpu)/4 + 2*pcb->p_nice;
-        if((pcb->user_prio)/4!=i)
-         {
-           QueueRemove(&pcb->l);
-           QueueInsertLast(&q[i],&pcb->l);
-         }
-     }
-  }
 
-  void print_q_state(Queue *q)
-  { 
-   int i=0,j=0;
-   Link *l; 
-   PCB* pcb;
+void quanta_q_update(PCB* pcb,Queue* q,int i)
+{
+	if((uint32)(pcb->estcpu)%4==0)
+	{
+		myprintf ("PID %d : Prio = %d --> ", pcb - &pcbs[0], pcb->user_prio);
+		pcb->user_prio = PUSER+(pcb->estcpu)/4 + 2*pcb->p_nice;
+		myprintf ("%d\n", pcb->user_prio);
+		if((pcb->user_prio)/4!=i)
+		{
+			QueueRemove(&pcb->l);
+			QueueInsertLast(&q[i],&pcb->l);
+		}
+	}
+}
 
-   while(i<NUM_OF_RUNQUEUE)
-     {  
-   	if(!QueueEmpty(&q[i]))
-	 { l = QueueFirst(&q[i]);
-          pcb = ((PCB*)l->object);
-           printf("In queue[%d]: %d --> ",i,pcb);
- 	   for(j=0;j<q[i].nitems-1;j++)
-	    {  l = QueueNext(l);
-               pcb = ((PCB*)l->object);
- 	       printf("%d --> ",pcb);
-            }
-	    printf("\n");
-          }
-        i++;
-      }
- }
+void print_q_state(Queue *q)
+{ 
+	int i=0,j=0;
+	Link *l; 
+	PCB* pcb;
+
+	while(i<NUM_OF_RUNQUEUE)
+	{  
+		if(!QueueEmpty(&q[i]))
+		{ l = QueueFirst(&q[i]);
+			pcb = ((PCB*)l->object);
+			myprintf("[%d]: %d ",i,pcb - &pcbs[0]);
+			for(j=0;j<q[i].nitems-1;j++)
+			{  l = QueueNext(l);
+				pcb = ((PCB*)l->object);
+				myprintf("---> %d",pcb - &pcbs[0]);
+			}
+			/* myprintf("\b\b\b\b"); */
+		}
+		i++;
+	}
+}
 //---------------------CS452__4.4 BSD SCHEDULING SPECIFIC END--------------------------/
 
 
@@ -307,7 +310,7 @@ ProcessSchedule ()
 
   //Each context switch increments the quanta
   total_num_quanta++;
-  printf("Current no. of Quanta elapsed : %d \n",total_num_quanta);
+  myprintf("\nQ%d: ",total_num_quanta);
 
   dbprintf ('p', "Now entering ProcessSchedule (cur=0x%x, %d ready)\n",
             currentPCB, QueueLength (&runQueue));
@@ -320,7 +323,7 @@ ProcessSchedule ()
   	if (!QueueEmpty (&runQueue[i])) 
   		break;
         else if(i==(NUM_OF_RUNQUEUE-1)){
-	    printf ("No runnable processes - exiting!\n");
+	    myprintf ("No runnable processes - exiting!\n");
 	    exitsim (); // NEVER RETURNS
 	  }
 	}	
@@ -354,14 +357,12 @@ ProcessSchedule ()
  //Global quantum tracker for 1s
         i=0;
   if(total_num_quanta%10==0){
-        printf("\nBefore decay "); 
+        myprintf("\n\nBefore decay -------\n"); 
         print_q_state(&runQueue[0]);
-        printf("-------\n"); 
 	decay_estcpu_prio(&runQueue[0]);
         reorder_q_all(&runQueue[0]);
-        printf("After decay "); 
+        myprintf("\n\nAfter decay -------\n"); 
         print_q_state(&runQueue[0]);
-        printf("-------\n"); 
 
               }
 
@@ -378,10 +379,10 @@ ProcessSchedule ()
   }
 
   // Now, run the one at the head of the queue.
-  printf(" Current PCB is %d ",currentPCB);
+  /* myprintf(" CurPID %d =====> ",currentPCB - &pcbs[0]); */
   pcb = (PCB *)((QueueFirst (&runQueue[i]))->object);
   currentPCB = pcb;
-  printf(" New PCB is %d ",currentPCB);
+  /* myprintf(" New PID %d ",currentPCB - &pcbs[0]); */
   dbprintf ('p',"About to switch to PCB 0x%x,flags=0x%x @ 0x%x\n",
             pcb, pcb->flags,
             pcb->sysStackPtr[PROCESS_STACK_IAR]);
@@ -964,8 +965,7 @@ main (int argc, char *argv[])
   debugstr[0] = '\0';
   MyFuncRetZero();
   printf ("Got %d arguments.\n", argc);
-  printf ("Available memory: 0x%x -> 0x%x.\n", lastosaddress,
-	  MemoryGetSize ());
+  printf ("Available memory: 0x%x -> 0x%x.\n", lastosaddress, MemoryGetSize ());
   printf ("Argument count is %d.\n", argc);
   for (i = 0; i < argc; i++) {
     printf ("Argument %d is %s.\n", i, argv[i]);
@@ -994,16 +994,13 @@ main (int argc, char *argv[])
 	fd = ProcessGetCodeInfo (argv[++i], &start, &codeS, &codeL, &dataS,
 				 &dataL);
 	printf ("File %s -> start=0x%08x\n", argv[i], start);
-	printf ("File %s -> code @ 0x%08x (size=0x%08x)\n", argv[i], codeS,
-		codeL);
-	printf ("File %s -> data @ 0x%08x (size=0x%08x)\n", argv[i], dataS,
-		dataL);
+	printf ("File %s -> code @ 0x%08x (size=0x%08x)\n", argv[i], codeS, codeL);
+	printf ("File %s -> data @ 0x%08x (size=0x%08x)\n", argv[i], dataS, dataL);
 	while ((n = ProcessGetFromFile (fd, buf, &addr, sizeof (buf))) > 0)
 	{
 	  for (j = 0; j < n; j += 4)
 	  {
-	    printf ("%08x: %02x%02x%02x%02x\n", addr + j - n, buf[j], buf[j+1],
-		    buf[j+2], buf[j+3]);
+	    printf ("%08x: %02x%02x%02x%02x\n", addr + j - n, buf[j], buf[j+1], buf[j+2], buf[j+3]);
 	  }
 	}
 	close (fd);

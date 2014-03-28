@@ -1,5 +1,5 @@
- an 	os.dlx	15798
- an OS - 	os.lst	16671
+ an 	os.dlx	16426
+ an OS - 	os.lst	17312
 .align	dlxos.s	/^.align 2$/
 .align	trap_random.s	/^.align 2$/
 .endproc	dlxos.s	/^.endproc _osinit$/
@@ -319,8 +319,8 @@ ASSERT	dlxos.h	/^#define	ASSERT(cond,s)	(cond ? 0 : printf ("%s: %s/
 CC	Makefile	/^CC = gcc-dlx$/
 CFLAGS	Makefile	/^CFLAGS = -mtraps -O3$/
 Close	filesys.h	/^  int	(*Close)(int);$/
-Close	os.dlx	15696
-Close	os.lst	16582
+Close	os.dlx	16324
+Close	os.lst	17223
 Close	userprog3.dlx	275
 Close	userprog3.lst	292
 Close	userprog4.dlx	218
@@ -466,12 +466,12 @@ MemoryPteToPage	memory.c	/^MemoryPteToPage (uint32 pte)$/
 MemorySetFreemap	memory.c	/^MemorySetFreemap (int p, int b)$/
 MemorySetupPte	memory.c	/^MemorySetupPte (uint32 page)$/
 MemoryTranslateUserToSystem	memory.c	/^MemoryTranslateUserToSystem (PCB *pcb, uint32 addr/
-Miller	os.dlx	15670
-Miller	os.dlx	15694
-Miller	os.dlx	15790
-Miller	os.lst	16558
-Miller	os.lst	16580
-Miller	os.lst	16663
+Miller	os.dlx	16298
+Miller	os.dlx	16322
+Miller	os.dlx	16418
+Miller	os.lst	17199
+Miller	os.lst	17221
+Miller	os.lst	17304
 Miller	userprog3.dlx	273
 Miller	userprog3.lst	290
 Miller	userprog4.dlx	216
@@ -554,9 +554,9 @@ RestoreIntrs	dlxos.h	/^RestoreIntrs (int intrs)$/
 SIZE_ARG_BUFF	process.h	72
 SRCS	Makefile	/^SRCS = filesys.c memory.c misc.c process.c queue.c/
 Sawdey	os.dlx	347
-Sawdey	os.dlx	15823
+Sawdey	os.dlx	16451
 Sawdey	os.lst	335
-Sawdey	os.lst	16692
+Sawdey	os.lst	17333
 Sawdey	trap_random.o	4
 Seek	filesys.h	/^  int	(*Seek)(int, int, int);$/
 Sem	synch.working.h	19
@@ -646,8 +646,8 @@ _LAB3_API_H_	lab3-api.h	9
 _LockAcquire	synch.working.s	/^_LockAcquire:$/
 _LockInit	synch.working.s	/^_LockInit:$/
 _LockRelease	synch.working.s	/^_LockRelease:$/
-_Lseek	os.dlx	15785
-_Lseek	os.lst	16659
+_Lseek	os.dlx	16413
+_Lseek	os.lst	17300
 _Lseek	usertraps.s	/^_Lseek:		$/
 _Open	userprog3.dlx	289
 _Open	userprog3.lst	302
@@ -689,12 +689,12 @@ _cond_wait	usertraps.s	/^_cond_wait:$/
 _dlx_h_	dlx.h	6
 _dlxos_h_	dlxos.h	6
 _dlxtraps_h_	traps.h	14
-_exit	os.dlx	15682
-_exit	os.dlx	15793
-_exit	os.lst	16569
-_exit	os.lst	16666
-_exitsim	os.dlx	15792
-_exitsim	os.lst	16665
+_exit	os.dlx	16310
+_exit	os.dlx	16421
+_exit	os.lst	17210
+_exit	os.lst	17307
+_exitsim	os.dlx	16420
+_exitsim	os.lst	17306
 _filesys_h_	filesys.h	14
 _getpid	usertraps.s	/^_getpid:$/
 _intrhandler	dlxos.o	48
@@ -731,8 +731,8 @@ _lastosaddress	osend.s	/^_lastosaddress:$/
 _lock_acquire	usertraps.s	/^_lock_acquire:$/
 _lock_create	usertraps.s	/^_lock_create:$/
 _lock_release	usertraps.s	/^_lock_release:$/
-_lseek	os.dlx	15741
-_lseek	os.lst	16621
+_lseek	os.dlx	16369
+_lseek	os.lst	17262
 _main	userprog3.dlx	38
 _main	userprog3.lst	55
 _main	userprog3.o	31
@@ -784,7 +784,7 @@ bzero	misc.c	/^bzero (char *dst, int count)$/
 chaseTail	sysproc.c	/^chaseTail (int me)$/
 clean	Makefile	/^clean:$/
 close	os.dlx	/^;;; with names such as open and close (lower case)/
-close	os.lst	/^15698                      ;;; with names such as /
+close	os.lst	/^16326                      ;;; with names such as /
 close	userprog3.dlx	/^;;; with names such as open and close (lower case)/
 close	userprog3.lst	/^  277                      ;;; with names such as /
 close	userprog4.dlx	/^;;; with names such as open and close (lower case)/
@@ -818,8 +818,8 @@ dlxos.o	Makefile	/^dlxos.o: dlxos.s$/
 dmindex	misc.c	/^dmindex (const char *s, const char *match)$/
 doSomething	sysproc.c	/^doSomething (int me)$/
 dointerrupt	traps.c	/^dointerrupt (unsigned int cause, unsigned int iar,/
-domain	os.dlx	15670
-domain	os.lst	16558
+domain	os.dlx	16298
+domain	os.lst	17199
 dstrcat	misc.c	/^dstrcat (char *onto, const char *addn)$/
 dstrcpy	misc.c	/^dstrcpy (char *to, const char *from)$/
 dstrlen	misc.c	/^dstrlen (const char *s)$/
@@ -839,14 +839,14 @@ exitsim	dlxos.o	/^;;; should call exitsim() or exit() rather than re/
 exitsim	os.dlx	/^;;; should call exitsim() or exit() rather than re/
 exitsim	os.dlx	/^;;; programs run without an OS - should call exits/
 exitsim	os.lst	/^   26                      ;;; should call exitsim/
-exitsim	os.lst	/^15798                      ;;; programs run withou/
+exitsim	os.lst	/^16426                      ;;; programs run withou/
 f30	dlxos.o	131
 f30	os.dlx	138
 f30	os.lst	134
 fd	filesys.h	47
 findpid	process.c	/^unsigned findpid(PCB *pcb)$/
-first	os.dlx	15792
-first	os.lst	16665
+first	os.dlx	16420
+first	os.lst	17306
 first	queue.h	30
 flags	filesys.h	56
 flags	process.h	44
@@ -907,8 +907,8 @@ it	os.lst	352
 it	trap_random.o	24
 l	process.h	48
 last	queue.h	31
-ld	os.dlx	15796
-ld be s	os.lst	16669
+ld	os.dlx	16424
+ld be s	os.lst	17310
 linkpool	queue.c	12
 locals	filesys.o	11
 locals	memory.o	11
@@ -981,6 +981,7 @@ previously	dlxos.o	179
 previously	os.dlx	186
 previously	os.lst	180
 pri	synch.working.h	30
+print_q_state	process.c	/^  void print_q_state(Queue *q)$/
 process	dlxos.o	57
 process	dlxos.o	58
 process	os.dlx	64
@@ -989,8 +990,8 @@ process	os.lst	60
 process	os.lst	61
 processQuantum	process.c	55
 process_create	process.c	/^void process_create(int p_nice, int p_info, char */
-programs	os.dlx	15743
-programs	os.lst	16622
+programs	os.dlx	16371
+programs	os.lst	17263
 programs	userprog3.dlx	283
 programs	userprog3.lst	297
 programs	userprog4.dlx	226
@@ -1353,15 +1354,15 @@ routine	dlxos.o	169
 routine	os.dlx	176
 routine	os.lst	171
 runQueue	process.c	37
-second	os.dlx	15793
-second	os.lst	16666
+second	os.dlx	16421
+second	os.lst	17307
 sem_t	lab2-api.h	15
 sem_t	lab3-api.h	15
 share_memory.o	Makefile	/^share_memory.o: share_memory.api$/
 shared_page	share_memory.h	16
 shared_page	share_memory.h	21
-simulator	os.dlx	15794
-simulator	os.lst	16667
+simulator	os.dlx	16422
+simulator	os.lst	17308
 size	os.dlx	3
 size	os.dlx	4
 size	os.lst	4
@@ -1391,12 +1392,12 @@ the	dlxos.o	50
 the	dlxos.o	58
 the	os.dlx	57
 the	os.dlx	65
-the	os.dlx	15792
-the	os.dlx	15793
+the	os.dlx	16420
+the	os.dlx	16421
 the	os.lst	55
 the	os.lst	61
-the	os.lst	16665
-the	os.lst	16666
+the	os.lst	17306
+the	os.lst	17307
 this	dlxos.o	184
 this	os.dlx	191
 this	os.lst	185
@@ -1440,8 +1441,8 @@ x2000	userprog4.lst	8
 x410	dlxos.o	332
 x410	os.dlx	339
 x410	os.lst	327
-xe000	os.dlx	7
-xe000	os.lst	8
+xf000	os.dlx	7
+xf000	os.lst	8
 xfff0	dlxos.o	304
 xfff0	os.dlx	311
 xfff0	os.lst	300
