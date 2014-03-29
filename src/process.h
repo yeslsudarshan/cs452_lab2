@@ -13,6 +13,7 @@
 #include "queue.h"
 //#include "share_memory.h"
 
+#define DEBUG 1
 #define myprintf printf
 
 #define	PROCESS_MAX_PROCS	32	// Maximum number of active processes
@@ -54,7 +55,10 @@ typedef struct PCB {
   float 	estcpu; 	//The estcpu for the process. Incremented every quantum
   float 	sleep_timestamp; //time stamp when the process was put to bed(In quantum)
   float         wakeup_timestamp; 
+  float 	switch_in_time;
+  float 	total_runtime;
   int           p_nice;
+  int 		p_info;
 } PCB;
 
 // Offsets of various registers from the stack pointer in the register

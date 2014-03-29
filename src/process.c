@@ -186,8 +186,8 @@ void decay_estcpu_prio(Queue* q)
             while(flag==0){
 	      pcb = (PCB*)(l->object);
 	      t = pcb->estcpu;
-	      myprintf (" \n estcpu = %0.2f  ",pcb->estcpu);
-	      myprintf (" \n PID %d Prio = %d ",pcb - &pcbs[0],pcb->user_prio);
+	      if(0) myprintf (" \n estcpu = %0.2f  ",pcb->estcpu);
+	      if(0) myprintf (" \n PID %d Prio = %d ",pcb - &pcbs[0],pcb->user_prio);
 	      pcb->estcpu *= 2/3;
 	      pcb->estcpu += pcb->p_nice; //Calculate the decayed estcpu for the proc
        	      pcb->user_prio = PUSER + (pcb->estcpu)/4 + 2*pcb->p_nice; //Recalculate the priority
@@ -195,8 +195,8 @@ void decay_estcpu_prio(Queue* q)
      	 	pcb->user_prio = 127;
 	
  	      t = pcb->estcpu;
-	      myprintf (" \n new estcpu = %0.2f  ",pcb->estcpu);
-	      myprintf (" \n PID %d new Prio = %d ",pcb - &pcbs[0],pcb->user_prio);
+	      if(0) myprintf (" \n new estcpu = %0.2f  ",pcb->estcpu);
+	      if(0) myprintf (" \n PID %d new Prio = %d ",pcb - &pcbs[0],pcb->user_prio);
 	      if(l == QueueLast(&q[i])) 
  		flag = 1;
               else             
@@ -252,13 +252,13 @@ void reorder_q_all(Queue* q)
 void quanta_q_update(PCB* pcb,Queue* q,int i)
 {
 	if((uint32)(pcb->exec_quanta)%4==0)
-	{       myprintf(" \n exec quanta = %d ",pcb->exec_quanta);
-		myprintf (" \n estcpu = %0.2f p_nice = %d",pcb->estcpu,pcb->p_nice);
-		myprintf (" \n PID %d Prio = %d --> ",pcb - &pcbs[0],pcb->user_prio);
+	{       if(0) myprintf(" \n exec quanta = %d ",pcb->exec_quanta);
+		if(0) myprintf (" \n estcpu = %0.2f p_nice = %d",pcb->estcpu,pcb->p_nice);
+		if(0) myprintf (" \n PID %d Prio = %d --> ",pcb - &pcbs[0],pcb->user_prio);
 		pcb->user_prio = PUSER+(pcb->estcpu)/4 + 2*pcb->p_nice;
                 if(pcb->user_prio > 127)
   		  pcb->user_prio = 127;
-		myprintf ("%d\n", pcb->user_prio);
+		if(0) myprintf ("%d\n", pcb->user_prio);
 		if((pcb->user_prio)/4!=i)
 		{
 			QueueRemove(&pcb->l);
@@ -280,14 +280,14 @@ void print_q_state(Queue *q)
 		{ 
 			l = QueueFirst(&q[i]);
 			pcb = ((PCB*)l->object);
-			myprintf("[%d]: %d ",i,pcb - &pcbs[0]);
+			if(0) myprintf("[%d]: %d ",i,pcb - &pcbs[0]);
 			for(j=0;j<q[i].nitems-1;j++)
 			{  
 				l = QueueNext(l);
 				pcb = ((PCB*)l->object);
-				myprintf("---> %d",pcb - &pcbs[0]);
+				if(0) myprintf("---> %d",pcb - &pcbs[0]);
 			}
-			/* myprintf("\b\b\b\b"); */
+			/* if(0) myprintf("\b\b\b\b"); */
 		}
 		i++;
 	}
@@ -327,7 +327,14 @@ ProcessSchedule ()
 
   //Each context switch increments the quanta
   total_num_quanta++;
-  myprintf("\nQ%d: ",total_num_quanta);
+  if(0) myprintf("\nQ%d: ",total_num_quanta);
+
+  if (currentPCB->p_info) {
+	  currentPCB->total_runtime +=  my_timer_get() - currentPCB->switch_in_time;
+	  printf (TIMESTRING1, currentPCB - &pcbs[0]);
+	  printf (TIMESTRING2, (currentPCB->total_runtime / 1000.0));
+	  printf (TIMESTRING3, currentPCB - &pcbs[0], currentPCB->user_prio);
+  }
 
   dbprintf ('p', "Now entering ProcessSchedule (cur=0x%x, %d ready)\n",
             currentPCB, QueueLength (&runQueue));
@@ -340,7 +347,7 @@ ProcessSchedule ()
   	if (!QueueEmpty (&runQueue[i])) 
   		break;
         else if(i==(NUM_OF_RUNQUEUE-1)){
-	    myprintf ("No runnable processes - exiting!\n");
+	    printf ("No runnable processes - exiting!\n");
 	    exitsim (); // NEVER RETURNS
 	  }
 	}	
@@ -375,11 +382,11 @@ ProcessSchedule ()
  //Global quantum tracker for 1s
         i=0;
   if(total_num_quanta%10==0){
-        myprintf("\n\nBefore decay -------\n"); 
+        if(0) myprintf("\n\nBefore decay -------\n"); 
         print_q_state(&runQueue[0]);
 	decay_estcpu_prio(&runQueue[0]);
         reorder_q_all(&runQueue[0]);
-        myprintf("\n\nAfter decay -------\n"); 
+        if(0) myprintf("\n\nAfter decay -------\n"); 
         print_q_state(&runQueue[0]);
 
               }
@@ -401,10 +408,10 @@ ProcessSchedule ()
   }
 
   // Now, run the one at the head of the queue.
-  /* myprintf(" CurPID %d =====> ",currentPCB - &pcbs[0]); */
+  /* if(0) myprintf(" CurPID %d =====> ",currentPCB - &pcbs[0]); */
   pcb = (PCB *)((QueueFirst (&runQueue[i]))->object);
   currentPCB = pcb;
-  /* myprintf(" New PID %d ",currentPCB - &pcbs[0]); */
+  /* if(0) myprintf(" New PID %d ",currentPCB - &pcbs[0]); */
   dbprintf ('p',"About to switch to PCB 0x%x,flags=0x%x @ 0x%x\n",
             pcb, pcb->flags,
             pcb->sysStackPtr[PROCESS_STACK_IAR]);
@@ -420,6 +427,9 @@ ProcessSchedule ()
   // Set the timer so this process gets at most a fixed quantum of time.
   TimerSet (processQuantum);
   dbprintf ('p', "Leaving ProcessSchedule (cur=0x%x)\n", currentPCB);
+
+  if (currentPCB->p_info)
+	  currentPCB->switch_in_time = my_timer_get();
 }
 
 //----------------------------------------------------------------------
@@ -636,6 +646,9 @@ ProcessFork (VoidFunc func, uint32 param, int p_nice,int p_info,char *name, int 
   // Lab3: initialized pcb member for your scheduling algorithm here
   //--------------------------------------
      pcb->estcpu = 0;
+	 pcb->p_info = p_info;
+	 pcb->switch_in_time = my_timer_get();
+	 pcb->total_runtime = 0;
 
      if(p_nice<0)
       pcb->p_nice = 0;
